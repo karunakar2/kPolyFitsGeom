@@ -1,0 +1,30 @@
+Metadata-Version: 2.1
+Name: kPolyFitsGeom
+Version: 0.0.1
+Summary: This module provides a single window to check if a geometry fits other, given they are on different spatial locations and have different orientation. The module brings in a ability to build a matrix of shapes that can fit in and can randomly pick, move then into the host. An example case is finding a home in a different locality and trying to check whether it is suitable to your plot elsewhere.
+Author-email: karunakar <karunakar.kintada@gmail.com>
+Project-URL: Homepage, https://github.com/karunakar2
+Project-URL: Bug Tracker, coming soon
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License--not finalised yet
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+The package implementation is straight forward.
+The following code is self explanatory.
+
+Two geopandas dataframe are required.
+1. the polygons table into which others are to be checked and moved.
+2. the polygon that will go in and sit in the above.
+
+from kPolyFitsGeom import kPolyFitsGeom
+myAlg = kPolyFitsGeom(plotsOfInterest,homesTemplate)
+myAlg.run()
+
+def myPlots():
+    ax = plotsOfInterest.plot()
+    myAlg.sampleFittedGeometry.plot(ax=ax,color='k',alpha=0.33)
+    plt.show()
+myPlots()

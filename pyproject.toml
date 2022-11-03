@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kPolyFitsGeom"
+version = "0.0.1"
+authors = [
+  { name="karunakar", email="karunakar.kintada@gmail.com" },
+]
+description = "This module provides a single window to check if a geometry fits other, given they are on different spatial locations and have different orientation. The module brings in a ability to build a matrix of shapes that can fit in and can randomly pick, move then into the host. An example case is finding a home in a different locality and trying to check whether it is suitable to your plot elsewhere."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License--not finalised yet",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/karunakar2"
+"Bug Tracker" = "coming soon"

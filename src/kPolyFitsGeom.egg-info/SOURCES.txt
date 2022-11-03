@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+src/kPolyFitsGeom/__init__.py
+src/kPolyFitsGeom/kPolyFitsGeom.py
+src/kPolyFitsGeom.egg-info/PKG-INFO
+src/kPolyFitsGeom.egg-info/SOURCES.txt
+src/kPolyFitsGeom.egg-info/dependency_links.txt
+src/kPolyFitsGeom.egg-info/top_level.txt

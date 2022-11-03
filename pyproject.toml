@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/karunakar2"
-"Bug Tracker" = "coming soon"
+"Homepage" = "https://github.com/karunakar2/kPolyFitsGeom.git"
+"Bug Tracker" = "https://github.com/karunakar2/kPolyFitsGeom/issues"

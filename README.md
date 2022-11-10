@@ -1,3 +1,7 @@
+The package has several external module dependencies.
+This module has been tested for basic functionality and reproduces reasonable results
+future version to include tests
+
 The package implementation is straight forward.
 The following code is self explanatory.
 

@@ -1,7 +1,9 @@
 """
 Module:   kPolyFitsGeom algorithm
 Author:   Karunakar
-Ticket:   github.com/karunakar2
+Version:   0.2
+Tickets:   https://github.com/karunakar2/kPolyFitsGeom
+
 
 Matrix of geometries from one table fitting into another table set
 """
@@ -38,7 +40,7 @@ class kPolyFitsGeom:
         print('Developed by karunakar for WDC LCM programme of work')
         print('https://github.com/karunakar2')
 
-    def notes():
+    def _notes(self):
         print(15*'-')
         print('Notes:')
         print('the sub system expects geopandas geodataframes as input')
@@ -58,10 +60,11 @@ class kPolyFitsGeom:
     def _file_checks(self):
         try:
             if self.host.geometry.is_valid.any() == False:
-                raise kPFGException('host has complex geometry')
+                raise kPFGException('host has invalid geometry')
             if self.tenant.geometry.is_valid.any() == False:
-                raise kPFGException('tenant has complex geometry')
+                raise kPFGException('tenant has invalid geometry')
         except Exception as er:
+            self._notes()
             print(er)
 
     def _env_checks(self):
@@ -74,26 +77,24 @@ class kPolyFitsGeom:
         except Exception as er:
             print(er)
 
+        try:
+            from pyspark.sql import Row
+            self._in_pyspark_env = True
+        except ModuleNotFoundError:
+            self._in_pyspark_env = False
+        except Exception as er:
+            print(er)
+
     ##-------------------
         #have to consolidate functions below
     #
     #https://stackoverflow.com/a/66118219/20171247
     def _azimuth_line(self,point1, point2):
-        """azimuth between 2 points (interval 0 - 180)"""
-        angle = np.arctan2(point2[0] - point1[0], point2[1] - point1[1])
-        return np.degrees(angle) if angle > 0 else np.degrees(angle) + 180
+        angle = np.arctan2(point2[1] - point1[1], point2[0] - point1[0]) #y,x notation #bug1
+        return np.degrees(angle) if angle > 0 else np.degrees(angle) + 360
 
-    """
-    def _dist_line(self,point1, point2):
-        #distance between points
-        return math.hypot(point2[0] - point1[0], point2[1] - point1[1])
-    """
-    
     def _azimuth_box(self,thisRect):
-        """azimuth of minimum_rotated_rectangle, angle of long side"""
         bbox = list(thisRect.exterior.coords)
-        #axis1 = self._dist_line(bbox[0], bbox[3])
-        #axis2 = self._dist_line(bbox[0], bbox[1])
         axis1 = Point(bbox[0]).distance(Point(bbox[3]))
         axis2 = Point(bbox[0]).distance(Point(bbox[1]))
         if axis1 <= axis2:
@@ -110,12 +111,12 @@ class kPolyFitsGeom:
         return thisGdf
 
     def _fit_geom_check(self,thisPlot):
-        tempDict=thisPlot.to_dict()
         localCopy = self.tenant.copy()
+        localCopy = localCopy[localCopy.geometry.area <= thisPlot.geometry.area] #might reduce the df size further, accelerates the code.
         localCopy['shiftX'] = localCopy.apply(lambda a: thisPlot.centerAt.x-a.centerAt.x, axis=1)
         localCopy['shiftY'] = localCopy.apply(lambda a: thisPlot.centerAt.y-a.centerAt.y, axis=1)
         localCopy['shiftedGeom'] = localCopy.apply(lambda x: affinity.translate(x['noOrientation'],x['shiftX'],x['shiftY']),axis=1) #or should we do plinthPlan itself: no this is simple
-        localCopy['fitsHost'] = localCopy.apply(lambda x: tempDict['noOrientation'].contains(x['shiftedGeom']), axis=1)
+        localCopy['fitsHost'] = localCopy.apply(lambda x: thisPlot['noOrientation'].contains(x['shiftedGeom']), axis=1)
         temp = localCopy[localCopy['fitsHost']==True]['Id'].values #.astype('int')
         if len(temp) > 0:
             return temp
@@ -158,7 +159,7 @@ class kPolyFitsGeom:
         tqdm.pandas()
 
         self._preproc_gpdf(self.host,self.clearance)
-        self.tenant = self.tenant[self.tenant.geometry.area <= self.host.geometry.area.max()]
+        self.tenant = self.tenant[self.tenant.geometry.area <= self.host.geometry.area.max()].copy()
         self._preproc_gpdf(self.tenant,0)
         
         #print(self.host.head(),self.tenant.head())

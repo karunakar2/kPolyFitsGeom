@@ -97,11 +97,11 @@ class kPolyFitsGeom:
         bbox = list(thisRect.exterior.coords)
         axis1 = Point(bbox[0]).distance(Point(bbox[3]))
         axis2 = Point(bbox[0]).distance(Point(bbox[1]))
-        if axis1 <= axis2:
-            az = self._azimuth_line(bbox[0], bbox[1])
-        else:
-            az = self._azimuth_line(bbox[0], bbox[3])
-        return az
+        return (
+            self._azimuth_line(bbox[0], bbox[1])
+            if axis1 <= axis2
+            else self._azimuth_line(bbox[0], bbox[3])
+        )
 
     #--- core non exposed methods
     def _preproc_gpdf(self,thisGdf,thisInnerClearance):
@@ -118,10 +118,7 @@ class kPolyFitsGeom:
         localCopy['shiftedGeom'] = localCopy.apply(lambda x: affinity.translate(x['noOrientation'],x['shiftX'],x['shiftY']),axis=1) #or should we do plinthPlan itself: no this is simple
         localCopy['fitsHost'] = localCopy.apply(lambda x: thisPlot['noOrientation'].contains(x['shiftedGeom']), axis=1)
         temp = localCopy[localCopy['fitsHost']==True]['Id'].values #.astype('int')
-        if len(temp) > 0:
-            return temp
-        else :
-            return np.nan #in case nothing fits there
+        return temp if len(temp) > 0 else np.nan
     
     #--- core function exposed to run the functionality
     def _fitMatrix(self):
